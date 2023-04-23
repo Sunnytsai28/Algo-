@@ -1,0 +1,87 @@
+import time
+import random
+
+def linear_search(S, x):
+  for i in range(len(S)):
+    if S[i] == x:
+      return True
+  return False
+
+def binary_search(S, x):
+  left = 0
+  right = len(S) - 1
+  while left <= right:
+    mid = (left + right) // 2
+    if S[mid] == x:
+      return True
+    elif S[mid] < x:
+      left = mid + 1
+    else:
+      right = mid - 1
+  return False
+
+def fibonacci_search(S, x):
+  fib2 = 0
+  fib1 = 1
+  fib = fib1 + fib2
+  n = len(S)
+  while fib < n:
+    fib2 = fib1
+    fib1 = fib
+    fib = fib1 + fib2
+  offset = -1
+  while fib > 1:
+    i = min(offset+fib2, n-1)
+    if S[i] < x:
+      fib = fib1
+      fib1 = fib2
+      fib2 = fib - fib1
+      offset = i
+    elif S[i] > x:
+      fib = fib2
+      fib1 = fib1 - fib2
+      fib2 = fib - fib1
+    else:
+      return True
+  if fib1 and offset < n-1 and S[offset+1] == x:
+    return True
+  return False
+
+def generate_list(n):
+  return [random.randint(1, 100000000) for i in range(n)]
+
+def run_search_algorithms(S, x):
+  start_time = time.time()
+  linear_search(S, x)
+  linear_time = time.time() - start_time
+  
+  start_time = time.time()
+  binary_search(S, x)
+  binary_time = time.time() - start_time
+  
+  start_time = time.time()
+  fibonacci_search(S, x)
+  fibonacci_time = time.time() - start_time
+  
+  return linear_time, binary_time, fibonacci_time
+
+def run_experiment():
+  results = []
+  for n in range(10, 1010, 10):
+    times = [0, 0, 0]
+    for i in range(5):
+      S = generate_list(n)
+      x = random.randint(1, 100000000)
+      linear_time, binary_time, fibonacci_time = run_search_algorithms(S, x)
+      times[0] += linear_time
+      times[1] += binary_time
+      times[2] += fibonacci_time
+    times = [t / 5 for t in times]
+    results.append((n, times[0], times[1], times[2]))
+  return results
+
+if __name__ == '__main__':
+    results = run_experiment()
+    print('n\tLinear\tBinary\tFibonacci')
+    for r in results:
+        print('{}\t{:.6f}\t{:.6f}\t{:.6f}'.format(r[0], r[1], r[2], r[3]))
